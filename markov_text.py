@@ -1,14 +1,13 @@
 import random
 import os
 import re
-base_dir = os.path.dirname(os.path.realpath(__file__))
 
 
-class FrequencyDistribution(dict):
+class FrequencyDistribution():
     def __init__(self, iterable=None):
-        super().__init__()
         self.types = 0  # num distinct items
         self.tokens = 0  # total items
+        self.dict = dict()
         if iterable:
             self.update(iterable)
 
@@ -16,11 +15,11 @@ class FrequencyDistribution(dict):
         """ Update distribution with items in `iterable`
         """
         for item in iterable:
-            if item in self:
-                self[item] += 1
+            if item in self.dict:
+                self.dict[item] += 1
                 self.tokens += 1
             else:
-                self[item] = 1
+                self.dict[item] = 1
                 self.types += 1
                 self.tokens += 1
 
@@ -31,23 +30,23 @@ class FrequencyDistribution(dict):
         Returns:
             int: Count of item in distribution or 0 if not present
         """
-        if item in self:
-            return self[item]
+        if item in self.dict:
+            return self.dict[item]
         return 0
 
     def max_l_item(self):
         """ Returns maximuim likelihood (frequency) item from the distribution
         """
-        return max(self, key=lambda k: self[k])
+        return max(self, key=lambda k: self.dict[k])
 
     def rand_weighted_item(self):
         """ Returns a random item from the distribution weighted by likelihood
         """
         random_int = random.randint(0, self.tokens - 1)
         index = 0
-        list_of_keys = list(self.keys())
+        list_of_keys = list(self.dict.keys())
         for i in range(0, self.types):
-            index += self[list_of_keys[i]]
+            index += self.dict[list_of_keys[i]]
             if(index > random_int):
                 return list_of_keys[i]
 
@@ -168,16 +167,18 @@ class MarkovChain:
             last_char = w_str[-2]
 
 
-# TODO: Move into model/Split up classes
-with open(os.path.join(base_dir, 'TRAINING_TEXT.txt'), encoding='utf8') as f:
-    corpus = f.read()
+if __name__ == '__main__':
+    # TODO: Move into model/Split up classes
+    base_dir = os.path.dirname(os.path.realpath(__file__))
+    with open(os.path.join(base_dir, 'data', 'hobbit.txt'), encoding='utf8') as f:
+        corpus = f.read()
 
-model = MarkovChain(order=3)
-# TODO: Add more text cleaning
+    model = MarkovChain(order=3)
+    # TODO: Add more text cleaning
 
-# remove 'Chapter II' etc
-pattern = ('(Chapter (?=[MDCLXVI])M*(C[MD]|D?C{0,3})' +
-           '(X[CL]|L?X{0,3})(I[XV]|V?I{0,3}))')
-cleaned = re.sub(pattern, '', corpus)
-model.train(cleaned)
-print(''.join([w for w in model.generate_text(max_len=200)]))
+    # remove 'Chapter II' etc
+    pattern = ('(Chapter (?=[MDCLXVI])M*(C[MD]|D?C{0,3})' +
+               '(X[CL]|L?X{0,3})(I[XV]|V?I{0,3}))')
+    cleaned = re.sub(pattern, '', corpus)
+    model.train(cleaned)
+    print(''.join([w for w in model.generate_text(max_len=200)]))
