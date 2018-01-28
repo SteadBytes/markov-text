@@ -1,6 +1,6 @@
 import re
 import glob
-from ngram import NGramDistribution
+from .ngram import NGramDistribution
 
 
 class ParsingException(Exception):

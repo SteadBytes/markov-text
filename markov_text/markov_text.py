@@ -1,17 +1,27 @@
 import os
 import sys
-from parse import Parser
-from text_gen import TextGenerator
-from ngram import NGramDistribution
+from .parse import Parser
+from .text_gen import TextGenerator
+from .ngram import NGramDistribution
+# TODO: Bulk parse from CLI
+# TODO: Better args parsing
 
 if __name__ == '__main__':
     base_dir = os.path.dirname(os.path.realpath(__file__))
     args = sys.argv
+    usage = f'Usage: {args[0]} (parse <name> <depth> <path to txt file>|gen <name> <count>)'
+
+    if len(args) < 3:
+        raise ValueError(usage)
 
     mode = args[1]
     ngram_name = args[2]
 
     if mode == 'parse':
+
+        if len(args) != 5:
+            raise ValueError(usage)
+
         order = int(args[3])
         fp = args[4]
         dist = NGramDistribution(order=order)

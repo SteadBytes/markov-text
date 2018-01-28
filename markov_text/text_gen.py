@@ -1,6 +1,6 @@
 import random
-from ngram import NGramDistribution
-from parse import Parser
+from .ngram import NGramDistribution
+from .parse import Parser
 
 
 class TextGenerator:
